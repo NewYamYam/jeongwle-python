@@ -91,9 +91,8 @@ class SwitchtitleDownloaderMiddleware:
         #   installed downloader middleware will be called
         # return None
         self.driver.get(request.url)
-        switchtitle = self.driver.find_element_by_css_selector(
-            "#productListArea > div.main_prodlist.main_prodlist_list")
-        switchtitle.click()
+        # switchtitle = self.driver.find_element_by_css_selector(
+        #     "#productListArea > div.main_prodlist.main_prodlist_list")
 
         body = to_bytes(text=self.driver.page_source)
         sleep(5)
@@ -126,13 +125,11 @@ class SwitchtitleDownloaderMiddleware:
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-gpu")
         # chrome_options.add_argument(f"--window-size={WINDOW_SIZE}")
-
-        chrome_ver = chromedriver_autoinstaller.get_chrome_version().split('.')[0]  #크롬드라이버 버전 확인
         try:
-            driver = webdriver.Chrome(f'/Users/jeongwle/Downloads/{chrome_ver}/chromedriver.exe')   
+            driver = webdriver.Chrome("/Users/jeongwle/Downloads/chromedriver")   
         except:
             chromedriver_autoinstaller.install(True)
-            driver = webdriver.Chrome(f'/Users/jeongwle/Downloads/{chrome_ver}/chromedriver.exe')
+            driver = webdriver.Chrome("/Users/jeongwle/Downloads/chromedriver")
         driver.implicitly_wait(10)
         self.driver = driver
 
