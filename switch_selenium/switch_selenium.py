@@ -16,10 +16,10 @@ driver.get(url='http://prod.danawa.com/list/?cate=11338057')
 total = int(driver.find_element_by_css_selector(
     '#danawa_content > div.product_list_wrap > div > div.prod_list_tab > ul > li.tab_item.selected > a > strong.list_num').text.strip('()'))
 idx = 0
-name = list(range(0, total))
-price = list(range(0, total))
-date = list(range(0, total))
-review = list(range(0, total))
+# name = list(range(0, total))
+# price = list(range(0, total))
+# date = list(range(0, total))
+# review = list(range(0, total))
 li_list = driver.find_elements_by_css_selector(
     '#productListArea > div.main_prodlist.main_prodlist_list > ul > li.prod_item.prod_layer[id]') #[id]는 li.prod_item.prod_layer중 id를 가진애들만 한다는 뜻
 for product in li_list:
@@ -31,14 +31,14 @@ for product in li_list:
     except :
         review[idx] = str(0)
     idx += 1
-    # print ('='*50)
-    # print('제품명 : {}'.format(name))
-    # if price == '일시품절' or price == '출시예정':
-    #     print(price)
-    # else:
-    #     print('가격 : {}원'.format(price))
-    # print('등록월 : {}'.format(date))
-    # print('상품의견 : {}건'.format(review))
+    print ('='*50)
+    print('제품명 : {}'.format(name))
+    if price == '일시품절' or price == '출시예정':
+        print(price)
+    else:
+        print('가격 : {}원'.format(price))
+    print('등록월 : {}'.format(date))
+    print('상품의견 : {}건'.format(review))
 try:
     next_page = driver.find_element_by_css_selector('#productListArea > div.prod_num_nav > div > div > a:nth-child(2)')
 except:
@@ -49,7 +49,7 @@ is_next = next_page.is_enabled()
 # # page = driver.find_element_by_css_selector('#productListArea > div.prod_num_nav > div > a').text
 # # print(page)
 while (is_next == True):
-    # print('='*40, '다음페이지', '='*40)
+    print('='*40, '다음페이지', '='*40)
     next_page.click()
     time.sleep(2)
     li_list = driver.find_elements_by_css_selector(
@@ -64,14 +64,14 @@ while (is_next == True):
         except :
             review[idx] = str(0)
         idx += 1
-        # print ('='*50)
-        # print('제품명 : {}'.format(name))
-        # if price == '일시품절' or price == '출시예정':
-        #     print(price)
-        # else:
-        #     print('가격 : {}원'.format(price))
-        # print('등록월 : {}'.format(date))
-        # print('상품의견 : {}건'.format(review))
+        print ('='*50)
+        print('제품명 : {}'.format(name))
+        if price == '일시품절' or price == '출시예정':
+            print(price)
+        else:
+            print('가격 : {}원'.format(price))
+        print('등록월 : {}'.format(date))
+        print('상품의견 : {}건'.format(review))
     page = driver.find_element_by_css_selector('#productListArea > div.prod_num_nav > div > div > a.num.now_on').text
     if int(page) % 10 == 0:
         try:
