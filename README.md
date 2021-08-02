@@ -29,7 +29,7 @@ Selenium을 활용하여 danawa 사이트 크롤링 in mac
 # 8월 1주차
 
 - selenium으로 크롤링 한 것 db(mysql)와 연동
-- [README.md](http://readme.md) 만들어보기
+- [README.md] 만들어보기
 - django 튜토리얼 따라해보기
 
 # 8월 2주차
