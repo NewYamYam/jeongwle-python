@@ -26,13 +26,20 @@ Selenium을 활용하여 danawa 사이트 크롤링 in mac
 
     이 사이트를 참고하여 brew를 이용해 설치하였습니다.
 
+5. mysql db연동시 ssl과 관련한 문제가 발생 시
+
+    [https://blog.minamiland.com/551](https://blog.minamiland.com/551)
+
+    이 사이트를 참고하여 따라해 보니 해결되었다.
+
 # 8월 1주차
 
 - selenium으로 크롤링 한 것 db(mysql)와 연동
 - README.md 만들어보기
-- django 튜토리얼 따라해보기
+- django 튜토리얼 4강까지 완료
 
 # 8월 2주차
 
-- django 튜토리얼 따라해보기(남았다면)
-- 그 외에는 아직 예정된 것 없음
+- django 튜토리얼 5강
+- 이력서 작성해보기
+- 크롤링 link 추가하기
