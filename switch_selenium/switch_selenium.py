@@ -6,7 +6,7 @@ options = webdriver.ChromeOptions()
 options.add_argument('headless')
 options.add_argument('ignore-certificate-errors')
 try:
-    driver = webdriver.Chrome("/Users/jeongwle/Downloads/chromedriver", options=options)   
+    driver = webdriver.Chrome("/Users/jeongwle/Downloads/chromedriver", options=options)
     # driver = webdriver.Chrome("/Users/jeongwle/Downloads/chromedriver")
 except:
     path = chromedriver_autoinstaller.install()
@@ -21,6 +21,7 @@ name = list(range(0, total))
 price = list(range(0, total))
 date = list(range(0, total))
 review = list(range(0, total))
+link = list(range(0, total))
 li_list = driver.find_elements_by_css_selector(
     '#productListArea > div.main_prodlist.main_prodlist_list > ul > li.prod_item.prod_layer[id]') #[id]는 li.prod_item.prod_layer중 id를 가진애들만 한다는 뜻
 for product in li_list:
@@ -31,6 +32,7 @@ for product in li_list:
         review[idx] = product.find_element_by_css_selector('div > div.prod_sub_info > div > dl.meta_item.mt_comment > dd > a > strong').text
     except :
         review[idx] = str(0)
+    link[idx] = str(product.find_element_by_css_selector('div > div.prod_info > p > a').get_attribute('href'))
     idx += 1
     # print ('='*50)
     # print('제품명 : {}'.format(name))
@@ -45,12 +47,12 @@ try:
 except:
     driver.quit()
 is_next = next_page.is_enabled()
-# # next_page.click()
-# # time.sleep(1)
-# # page = driver.find_element_by_css_selector('#productListArea > div.prod_num_nav > div > a').text
-# # print(page)
+# next_page.click()
+# time.sleep(1)
+# page = driver.find_element_by_css_selector('#productListArea > div.prod_num_nav > div > a').text
+# print(page)
 while (is_next == True):
-    # print('='*40, '다음페이지', '='*40)
+#     # print('='*40, '다음페이지', '='*40)
     next_page.click()
     time.sleep(2)
     li_list = driver.find_elements_by_css_selector(
@@ -64,6 +66,7 @@ while (is_next == True):
             review[idx] = product.find_element_by_css_selector('div > div.prod_sub_info > div > dl.meta_item.mt_comment > dd > a > strong').text
         except :
             review[idx] = str(0)
+        link[idx] = str(product.find_element_by_css_selector('div > div.prod_info > p > a').get_attribute('href'))
         idx += 1
         # print ('='*50)
         # print('제품명 : {}'.format(name))
@@ -88,7 +91,7 @@ while (is_next == True):
     is_next = next_page.is_enabled()
 driver.quit()
 
-results = [[0 for j in range(4)]for i in range(total)]
+results = [[0 for j in range(5)]for i in range(total)]
 idx = 0
 for i in range(total):
     results[idx][0] = name[idx]
@@ -98,6 +101,7 @@ for i in range(total):
         results[idx][1] = price[idx]
     results[idx][2] = date[idx]
     results[idx][3] = review[idx]
+    results[idx][4] = link[idx]
     idx += 1
 
 import pymysql
@@ -110,19 +114,19 @@ conn = pymysql.connect(
 )
 cursor=conn.cursor()
 cursor.execute("DROP TABLE IF EXISTS switchtitle")
-cursor.execute("CREATE TABLE switchtitle (number int, title text, price text, date text, review text)")
+cursor.execute("CREATE TABLE switchtitle (number int, title text, price text, date text, review text, link text)")
 idx = 0
 i = 1
 for j in range(total):
     cursor.execute(
-        f'INSERT INTO switchtitle VALUES({i}, \"{results[idx][0]}\", \"{results[idx][1]}\", \"{results[idx][2]}\", \"{results[idx][3]}\")'
+        f'INSERT INTO switchtitle VALUES({i}, \"{results[idx][0]}\", \"{results[idx][1]}\", \"{results[idx][2]}\", \"{results[idx][3]}\", \"{results[idx][4]}\")'
     )
     i += 1
     idx += 1
 conn.commit()
 conn.close()
-# import pandas as pd
+# # import pandas as pd
 
-# data = pd.DataFrame(results)
-# data.columns = ['title', 'price', 'date', 'review']
-# data.to_csv('스위치타이틀_cp949.csv', encoding='cp949') 
+# # data = pd.DataFrame(results)
+# # data.columns = ['title', 'price', 'date', 'review']
+# # data.to_csv('스위치타이틀_cp949.csv', encoding='cp949') 
