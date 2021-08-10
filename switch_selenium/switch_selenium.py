@@ -33,15 +33,15 @@ for product in li_list:
     except :
         review[idx] = str(0)
     link[idx] = str(product.find_element_by_css_selector('div > div.prod_info > p > a').get_attribute('href'))
-    idx += 1
     # print ('='*50)
     # print('제품명 : {}'.format(name))
-    # if price == '일시품절' or price == '출시예정':
-    #     print(price)
+    if price[idx] == '일시품절' or price[idx] == '출시예정':
+        print(price[idx] + '-')
     # else:
     #     print('가격 : {}원'.format(price))
     # print('등록월 : {}'.format(date))
     # print('상품의견 : {}건'.format(review))
+    idx += 1
 try:
     next_page = driver.find_element_by_css_selector('#productListArea > div.prod_num_nav > div > div > a:nth-child(2)')
 except:
@@ -52,7 +52,7 @@ is_next = next_page.is_enabled()
 # page = driver.find_element_by_css_selector('#productListArea > div.prod_num_nav > div > a').text
 # print(page)
 while (is_next == True):
-#     # print('='*40, '다음페이지', '='*40)
+    print('='*40, '다음페이지', '='*40)
     next_page.click()
     time.sleep(2)
     li_list = driver.find_elements_by_css_selector(
@@ -67,11 +67,11 @@ while (is_next == True):
         except :
             review[idx] = str(0)
         link[idx] = str(product.find_element_by_css_selector('div > div.prod_info > p > a').get_attribute('href'))
-        idx += 1
         # print ('='*50)
         # print('제품명 : {}'.format(name))
-        # if price == '일시품절' or price == '출시예정':
-        #     print(price)
+        if price[idx] == '일시품절' or price[idx] == '출시예정':
+            print(price[idx] + '-')
+        idx += 1
         # else:
         #     print('가격 : {}원'.format(price))
         # print('등록월 : {}'.format(date))
@@ -91,17 +91,19 @@ while (is_next == True):
     is_next = next_page.is_enabled()
 driver.quit()
 
-results = [[0 for j in range(5)]for i in range(total)]
+results = [[0 for j in range(6)]for i in range(total)]
 idx = 0
 for i in range(total):
     results[idx][0] = name[idx]
     if price[idx] == '일시품절' or price[idx] == '출시예정':
-        results[idx][1] = price[idx]
+        results[idx][1] = 0
+        results[idx][2] = price[idx]
     else:
-        results[idx][1] = price[idx]
-    results[idx][2] = date[idx]
-    results[idx][3] = review[idx]
-    results[idx][4] = link[idx]
+        results[idx][1] = int(price[idx].replace(",", ""))
+        results[idx][2] = '판매중'
+    results[idx][3] = date[idx]
+    results[idx][4] = int(review[idx].replace(",", ""))
+    results[idx][5] = link[idx]
     idx += 1
 
 import pymysql
@@ -113,14 +115,20 @@ conn = pymysql.connect(
     db = "NINTENDO"
 )
 cursor=conn.cursor()
-cursor.execute("DROP TABLE IF EXISTS switchtitle")
-cursor.execute("CREATE TABLE switchtitle (number int, title text, price text, date text, review text, link text)")
+cursor.execute("CREATE TABLE IF NOT EXISTS switchtitle (number int, title text, price int, status text, date text, review int, link text)")
 idx = 0
 i = 1
 for j in range(total):
-    cursor.execute(
-        f'INSERT INTO switchtitle VALUES({i}, \"{results[idx][0]}\", \"{results[idx][1]}\", \"{results[idx][2]}\", \"{results[idx][3]}\", \"{results[idx][4]}\")'
-    )
+    return_value = cursor.execute("SELECT * FROM switchtitle WHERE link = '%s'" %results[idx][5])
+    if (return_value == 1):
+        cursor.execute("UPDATE switchtitle SET number = %s WHERE link = '%s'" %(i, results[idx][5]))
+        cursor.execute("UPDATE switchtitle SET price = '%s' WHERE link = '%s'" %(results[idx][1], results[idx][5]))
+        cursor.execute("UPDATE switchtitle SET status = '%s' WHERE link = '%s'" %(results[idx][2], results[idx][5]))
+        cursor.execute("UPDATE switchtitle SET review = '%s' WHERE link = '%s'" %(results[idx][4], results[idx][5]))
+    else :
+        cursor.execute(
+            f'INSERT INTO switchtitle VALUES({i}, \"{results[idx][0]}\", \"{results[idx][1]}\", \"{results[idx][2]}\", \"{results[idx][3]}\", \"{results[idx][4]}\", \"{results[idx][5]}\")'
+            )
     i += 1
     idx += 1
 conn.commit()
