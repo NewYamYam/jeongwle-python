@@ -1,33 +1,34 @@
-# import pymysql
+import pymysql
 
-# conn = pymysql.connect(
-#     user = "jeongwle",
-#     passwd = "1q2w3E4R!",
-#     host = "localhost",
-#     db = "NINTENDO"
-# )
-# cursor=conn.cursor()
-# string = "http://prod.danawa.com/info/?pcode=11215266&cate=11338057"
+conn = pymysql.connect(
+    user = "jeongwle",
+    passwd = "1q2w3E4R!",
+    host = "localhost",
+    db = "NINTENDO"
+)
+cursor=conn.cursor()
+string = "http://prod.danawa.com/info/?pcode=11215266&cate=11338057"
 # a = 0
-# result = cursor.execute("SELECT * FROM switchtitle WHERE link = '%s" %string)
-# # result = cursor.execute("CREATE TABLE test5 (number int)")
-# print(result)
-# # cursor.execute("CREATE TABLE switchtitle (number int, title text, price text, date text, 'review' text)")
-# # idx = 0
-# # i = 1
-# # for j in range(total):
-# #     cursor.execute(
-# #         f'INSERT INTO switchtitle VALUES({i}, \"{results[idx][0]}\", \"{results[idx][1]}\", \"{results[idx][2]}\", \"{results[idx][3]}\")'
-# #     )
-# #     i += 1
-# #     idx += 1
-# conn.commit()
-# conn.close()
+# result = cursor.execute("SELECT * FROM switchtitle WHERE link = '%s'" %string)
+result = cursor.execute ("INSERT INTO switchtitle (title, link) VALUES ('hihi', 'http://prod.danawa.com/info/?pcode=5757519&cate=11338057')")
+# result = cursor.execute("CREATE TABLE test5 (number int)")
+print(result)
+# cursor.execute("CREATE TABLE switchtitle (number int, title text, price text, date text, 'review' text)")
+# idx = 0
+# i = 1
+# for j in range(total):
+#     cursor.execute(
+#         f'INSERT INTO switchtitle VALUES({i}, \"{results[idx][0]}\", \"{results[idx][1]}\", \"{results[idx][2]}\", \"{results[idx][3]}\")'
+#     )
+#     i += 1
+#     idx += 1
+conn.commit()
+conn.close()
 
 #### , 빼는거 고민####
-b = "1,234"
-a =int(b.replace(',', ""))
-print(b + '-')
+# b = "1,234"
+# a =int(b.replace(',', ""))
+# print(b + '-')
 # from selenium import webdriver
 # import chromedriver_autoinstaller
 # import time
@@ -60,3 +61,8 @@ print(b + '-')
 # a[2] = 3
 # a[3] = "bye"
 # print(a)
+
+import datetime
+
+date = datetime.datetime.now().strftime('%Y.%m.%d')
+print(date)

@@ -1,6 +1,7 @@
 from selenium import webdriver
 import chromedriver_autoinstaller
 import time
+import datetime
 
 options = webdriver.ChromeOptions()
 options.add_argument('headless')
@@ -33,15 +34,15 @@ for product in li_list:
     except :
         review[idx] = str(0)
     link[idx] = str(product.find_element_by_css_selector('div > div.prod_info > p > a').get_attribute('href'))
+    idx += 1
     # print ('='*50)
     # print('제품명 : {}'.format(name))
-    if price[idx] == '일시품절' or price[idx] == '출시예정':
-        print(price[idx] + '-')
+    # if price[idx] == '일시품절' or price[idx] == '출시예정':
+        # print(price[idx] + '-')
     # else:
     #     print('가격 : {}원'.format(price))
     # print('등록월 : {}'.format(date))
     # print('상품의견 : {}건'.format(review))
-    idx += 1
 try:
     next_page = driver.find_element_by_css_selector('#productListArea > div.prod_num_nav > div > div > a:nth-child(2)')
 except:
@@ -67,11 +68,11 @@ while (is_next == True):
         except :
             review[idx] = str(0)
         link[idx] = str(product.find_element_by_css_selector('div > div.prod_info > p > a').get_attribute('href'))
+        idx += 1
         # print ('='*50)
         # print('제품명 : {}'.format(name))
-        if price[idx] == '일시품절' or price[idx] == '출시예정':
-            print(price[idx] + '-')
-        idx += 1
+        # if price[idx] == '일시품절' or price[idx] == '출시예정':
+        #     print(price[idx] + '-')
         # else:
         #     print('가격 : {}원'.format(price))
         # print('등록월 : {}'.format(date))
@@ -105,6 +106,7 @@ for i in range(total):
     results[idx][4] = int(review[idx].replace(",", ""))
     results[idx][5] = link[idx]
     idx += 1
+today = datetime.datetime.now().strftime('%Y.%m.%d')
 
 import pymysql
 
@@ -115,21 +117,22 @@ conn = pymysql.connect(
     db = "NINTENDO"
 )
 cursor=conn.cursor()
-cursor.execute("CREATE TABLE IF NOT EXISTS switchtitle (number int, title text, price int, status text, date text, review int, link text)")
+cursor.execute("CREATE TABLE IF NOT EXISTS switchtitle (number int auto_increment, title text, price int, status text, release_date text, review int, modified_date text, link varchar(500), PRIMARY KEY (number), UNIQUE KEY (link))")
 idx = 0
-i = 1
-for j in range(total):
-    return_value = cursor.execute("SELECT * FROM switchtitle WHERE link = '%s'" %results[idx][5])
-    if (return_value == 1):
-        cursor.execute("UPDATE switchtitle SET number = %s WHERE link = '%s'" %(i, results[idx][5]))
-        cursor.execute("UPDATE switchtitle SET price = '%s' WHERE link = '%s'" %(results[idx][1], results[idx][5]))
-        cursor.execute("UPDATE switchtitle SET status = '%s' WHERE link = '%s'" %(results[idx][2], results[idx][5]))
-        cursor.execute("UPDATE switchtitle SET review = '%s' WHERE link = '%s'" %(results[idx][4], results[idx][5]))
-    else :
+for i in range(total):
+    # return_value = cursor.execute("SELECT * FROM switchtitle WHERE link = '%s'" %results[idx][5])
+    # if (return_value == 1):
+    try :
+        # cursor.execute("UPDATE switchtitle SET number = %s WHERE link = '%s'" %(i, results[idx][5]))
+        # cursor.execute("UPDATE switchtitle SET price = '%s' WHERE link = '%s'" %(results[idx][1], results[idx][5]))
+        # cursor.execute("UPDATE switchtitle SET status = '%s' WHERE link = '%s'" %(results[idx][2], results[idx][5]))
+        # cursor.execute("UPDATE switchtitle SET review = '%s' WHERE link = '%s'" %(results[idx][4], results[idx][5]))
+        cursor.execute("UPDATE switchtitle SET price = %s, status = '%s', review = %s, modified_date = '%s' WHERE link = '%s'" %(results[idx][1], results[idx][2], results[idx][4], today, results[idx][5]))
+        #UPDATE문 하나로 처리해보기. primary key 지정(주로 number) 중복방지를 key를 이용해서 해결하기.
+    except :
         cursor.execute(
-            f'INSERT INTO switchtitle VALUES({i}, \"{results[idx][0]}\", \"{results[idx][1]}\", \"{results[idx][2]}\", \"{results[idx][3]}\", \"{results[idx][4]}\", \"{results[idx][5]}\")'
+            f'INSERT INTO switchtitle(title, price, status, release_date, review, modified_date, link) VALUES(\"{results[idx][0]}\", \"{results[idx][1]}\", \"{results[idx][2]}\", \"{results[idx][3]}\", \"{results[idx][4]}\", \"{today}\", \"{results[idx][5]}\")'
             )
-    i += 1
     idx += 1
 conn.commit()
 conn.close()
