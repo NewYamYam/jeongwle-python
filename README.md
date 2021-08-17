@@ -43,3 +43,9 @@ Selenium을 활용하여 danawa 사이트 크롤링 in mac
 - django 튜토리얼 5강
 - 이력서 작성해보기
 - 크롤링 link 추가하기 및 status 추가 등 손볼 것 손보기
+
+# 8월 3주차
+
+- django 튜토리얼 끝까지
+- 키 관련 공부하고 pk지정해보기
+- db 동영상 보기
