@@ -120,16 +120,12 @@ cursor=conn.cursor()
 cursor.execute("CREATE TABLE IF NOT EXISTS switchtitle (number int auto_increment, title text, price int, status text, release_date text, review int, modified_date text, link varchar(500), PRIMARY KEY (number), UNIQUE KEY (link))")
 idx = 0
 for i in range(total):
-    # return_value = cursor.execute("SELECT * FROM switchtitle WHERE link = '%s'" %results[idx][5])
-    # if (return_value == 1):
-    try :
-        # cursor.execute("UPDATE switchtitle SET number = %s WHERE link = '%s'" %(i, results[idx][5]))
-        # cursor.execute("UPDATE switchtitle SET price = '%s' WHERE link = '%s'" %(results[idx][1], results[idx][5]))
-        # cursor.execute("UPDATE switchtitle SET status = '%s' WHERE link = '%s'" %(results[idx][2], results[idx][5]))
-        # cursor.execute("UPDATE switchtitle SET review = '%s' WHERE link = '%s'" %(results[idx][4], results[idx][5]))
+    return_value = cursor.execute("SELECT * FROM switchtitle WHERE link = '%s'" %results[idx][5])
+    if (return_value == 1):
+    # try :
         cursor.execute("UPDATE switchtitle SET price = %s, status = '%s', review = %s, modified_date = '%s' WHERE link = '%s'" %(results[idx][1], results[idx][2], results[idx][4], today, results[idx][5]))
-        #UPDATE문 하나로 처리해보기. primary key 지정(주로 number) 중복방지를 key를 이용해서 해결하기.
-    except :
+    # except :
+    else :
         cursor.execute(
             f'INSERT INTO switchtitle(title, price, status, release_date, review, modified_date, link) VALUES(\"{results[idx][0]}\", \"{results[idx][1]}\", \"{results[idx][2]}\", \"{results[idx][3]}\", \"{results[idx][4]}\", \"{today}\", \"{results[idx][5]}\")'
             )
