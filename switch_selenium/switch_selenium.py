@@ -23,6 +23,7 @@ price = list(range(0, total))
 date = list(range(0, total))
 review = list(range(0, total))
 link = list(range(0, total))
+pcode = list(range(0, total))
 li_list = driver.find_elements_by_css_selector(
     '#productListArea > div.main_prodlist.main_prodlist_list > ul > li.prod_item.prod_layer[id]') #[id]는 li.prod_item.prod_layer중 id를 가진애들만 한다는 뜻
 for product in li_list:
@@ -33,7 +34,9 @@ for product in li_list:
         review[idx] = product.find_element_by_css_selector('div > div.prod_sub_info > div > dl.meta_item.mt_comment > dd > a > strong').text
     except :
         review[idx] = str(0)
+    # review[idx] = str(0)
     link[idx] = str(product.find_element_by_css_selector('div > div.prod_info > p > a').get_attribute('href'))
+    pcode[idx] = str(product.get_attribute('id')).lstrip('productItem')
     idx += 1
     # print ('='*50)
     # print('제품명 : {}'.format(name))
@@ -67,7 +70,9 @@ while (is_next == True):
             review[idx] = product.find_element_by_css_selector('div > div.prod_sub_info > div > dl.meta_item.mt_comment > dd > a > strong').text
         except :
             review[idx] = str(0)
+        # review[idx] = str(0)
         link[idx] = str(product.find_element_by_css_selector('div > div.prod_info > p > a').get_attribute('href'))
+        pcode[idx] = str(product.get_attribute('id')).lstrip('productItem')
         idx += 1
         # print ('='*50)
         # print('제품명 : {}'.format(name))
@@ -92,7 +97,7 @@ while (is_next == True):
     is_next = next_page.is_enabled()
 driver.quit()
 
-results = [[0 for j in range(6)]for i in range(total)]
+results = [[0 for j in range(7)]for i in range(total)]
 idx = 0
 for i in range(total):
     results[idx][0] = name[idx]
@@ -105,6 +110,7 @@ for i in range(total):
     results[idx][3] = date[idx]
     results[idx][4] = int(review[idx].replace(",", ""))
     results[idx][5] = link[idx]
+    results[idx][6] = pcode[idx]
     idx += 1
 today = datetime.datetime.now().strftime('%Y.%m.%d')
 
@@ -112,28 +118,32 @@ import pymysql
 
 conn = pymysql.connect(
     user = "jeongwle",
-    passwd = "1q2w3E4R!",
+    password = "1q2w3E4R!",
     host = "localhost",
     db = "NINTENDO"
 )
 cursor=conn.cursor()
-cursor.execute("CREATE TABLE IF NOT EXISTS switchtitle (number int auto_increment, title text, price int, status text, release_date text, review int, modified_date text, link varchar(500), PRIMARY KEY (number), UNIQUE KEY (link))")
+cursor.execute("CREATE TABLE IF NOT EXISTS switchtitle (number int auto_increment, title varchar(100), status varchar(20), release_date varchar(20), link varchar(100), pcode varchar(20), PRIMARY KEY (number), UNIQUE KEY (link, pcode))")
+cursor.execute("CREATE TABLE IF NOT EXISTS price (number int auto_increment, product_id int, price int, modified_date varchar(20), PRIMARY KEY (number), FOREIGN KEY (product_id) REFERENCES switchtitle (number))")
+cursor.execute("CREATE TABLE IF NOT EXISTS review (number int auto_increment, product_id int, review int, modified_date varchar(20), PRIMARY KEY (number), FOREIGN KEY (product_id) REFERENCES switchtitle (number))")
 idx = 0
 for i in range(total):
-    return_value = cursor.execute("SELECT * FROM switchtitle WHERE link = '%s'" %results[idx][5])
+    return_value = cursor.execute("SELECT * FROM switchtitle WHERE pcode = '%s'" %results[idx][6])
     if (return_value == 1):
     # try :
-        cursor.execute("UPDATE switchtitle SET price = %s, status = '%s', review = %s, modified_date = '%s' WHERE link = '%s'" %(results[idx][1], results[idx][2], results[idx][4], today, results[idx][5]))
+        cursor.execute("UPDATE switchtitle SET status = '%s' WHERE pcode = '%s'" %(results[idx][2], results[idx][6]))
     # except :
     else :
         cursor.execute(
-            f'INSERT INTO switchtitle(title, price, status, release_date, review, modified_date, link) VALUES(\"{results[idx][0]}\", \"{results[idx][1]}\", \"{results[idx][2]}\", \"{results[idx][3]}\", \"{results[idx][4]}\", \"{today}\", \"{results[idx][5]}\")'
+            f'INSERT INTO switchtitle(title, status, release_date, link, pcode) VALUES(\"{results[idx][0]}\", \"{results[idx][2]}\", \"{results[idx][3]}\", \"{results[idx][5]}\", \"{results[idx][6]}\")'
             )
+    cursor.execute(f"INSERT INTO price(product_id, price, modified_date) VALUES((SELECT number from switchtitle where pcode = \"{results[idx][6]}\"), \"{results[idx][1]}\", \"{today}\")")
+    cursor.execute(f"INSERT INTO review(product_id, review, modified_date) VALUES((SELECT number from switchtitle where pcode = \"{results[idx][6]}\"), \"{results[idx][4]}\", \"{today}\")")
     idx += 1
 conn.commit()
 conn.close()
-# # import pandas as pd
+# # # import pandas as pd
 
-# # data = pd.DataFrame(results)
-# # data.columns = ['title', 'price', 'date', 'review']
-# # data.to_csv('스위치타이틀_cp949.csv', encoding='cp949') 
+# # # data = pd.DataFrame(results)
+# # # data.columns = ['title', 'price', 'date', 'review']
+# # # data.to_csv('스위치타이틀_cp949.csv', encoding='cp949') 
