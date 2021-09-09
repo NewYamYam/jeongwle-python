@@ -123,7 +123,7 @@ conn = pymysql.connect(
     db = "NINTENDO"
 )
 cursor=conn.cursor()
-cursor.execute("CREATE TABLE IF NOT EXISTS switchtitle (number int auto_increment, title varchar(100), status varchar(20), release_date varchar(20), link varchar(100), pcode varchar(20), PRIMARY KEY (number), UNIQUE KEY (link, pcode))")
+cursor.execute("CREATE TABLE IF NOT EXISTS switchtitle (number int auto_increment, title varchar(100), status varchar(20), release_date varchar(20), link varchar(100), pcode varchar(20), PRIMARY KEY (number), UNIQUE KEY (pcode))")
 cursor.execute("CREATE TABLE IF NOT EXISTS price (number int auto_increment, product_id int, price int, modified_date varchar(20), PRIMARY KEY (number), FOREIGN KEY (product_id) REFERENCES switchtitle (number))")
 cursor.execute("CREATE TABLE IF NOT EXISTS review (number int auto_increment, product_id int, review int, modified_date varchar(20), PRIMARY KEY (number), FOREIGN KEY (product_id) REFERENCES switchtitle (number))")
 idx = 0
